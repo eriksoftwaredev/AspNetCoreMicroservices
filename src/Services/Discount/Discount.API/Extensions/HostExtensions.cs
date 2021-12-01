@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Polly;
+using System;
 
 namespace Discount.API.Extensions
 {
@@ -26,13 +23,13 @@ namespace Discount.API.Extensions
                     logger.LogInformation("Migrating postresql database.");
 
                     var retry = Policy.Handle<NpgsqlException>()
-                        .WaitAndRetry(
-                            retryCount: 5,
-                            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), // 2,4,8,16,32 sc
-                            onRetry: (exception, retryCount, context) =>
-                            {
-                                logger.LogError($"Retry {retryCount} of {context.PolicyKey} at {context.OperationKey}, due to: {exception}.");
-                            });
+                            .WaitAndRetry(
+                                retryCount: 5,
+                                sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), // 2,4,8,16,32 sc
+                                onRetry: (exception, retryCount, context) =>
+                                {
+                                    logger.LogError($"Retry {retryCount} of {context.PolicyKey} at {context.OperationKey}, due to: {exception}.");
+                                });
 
                     //if the postgresql server container is not created on run docker compose this
                     //migration can't fail for network related exception. The retry options for database operations
