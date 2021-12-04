@@ -10,7 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Basket.API.Controllers;
+using Basket.API.gRPCServices;
 using Basket.API.Repositoies;
+using Discount.GRPC.Protos;
 
 namespace Basket.API
 {
@@ -26,6 +29,10 @@ namespace Basket.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //var serviceProvider = services.BuildServiceProvider();
+            //var logger = serviceProvider.GetService<ILogger<BasketController>>();
+            //services.AddSingleton(typeof(ILogger), logger);
+
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = Configuration.GetValue<string>("CacheSettings:ConnectionString");
@@ -38,6 +45,12 @@ namespace Basket.API
             });
 
             services.AddScoped<IBasketRepository, BasketRepository>();
+            services.AddScoped<DiscountGRPCService>();
+            services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>
+            (options =>
+            {
+                options.Address = new Uri(Configuration["gRPCSettings:DiscountUrl"]);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
