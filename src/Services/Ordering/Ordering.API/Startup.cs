@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EventBus.Messages.Common;
+using MassTransit;
+using Ordering.API.EventBusConsumer;
 using Ordering.Application;
 using Ordering.Infrastructure;
 
@@ -26,9 +29,30 @@ namespace Ordering.API
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        {  
+            services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<BasketCheckoutConsumer>();
+
             services.AddApplicationServices();
             services.AddInfrastructureServices(Configuration);
+
+            services.AddMassTransit(config =>
+            {
+                config.AddConsumer<BasketCheckoutConsumer>();
+
+                config.UsingRabbitMq((ctx, cfg) =>
+                {
+                    cfg.Host(Configuration["EventBusSettings:HostAddress"]);
+
+                    cfg.ReceiveEndpoint(EventBusConstants.BasketCheckoutQueue, c =>
+                    {
+                        c.ConfigureConsumer<BasketCheckoutConsumer>(ctx);
+                    });
+                });
+            });
+            services.AddMassTransitHostedService();
+
+
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
