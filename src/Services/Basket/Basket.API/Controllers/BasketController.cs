@@ -86,6 +86,7 @@ namespace Basket.API.Controllers
 
             // Send checkout event to rabbitMQ
             await _publishEndpoint.Publish(eventMessage);
+          
 
             // Remove the basket
             await _repository.DeleteBasket(basket.UserName);
