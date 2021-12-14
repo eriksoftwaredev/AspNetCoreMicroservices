@@ -39,6 +39,7 @@ namespace Basket.API.Controllers
         public async Task<ActionResult<ShoppingCart>> GetBasket(string username)
         {
             var basket = await _repository.GetBasket(username);
+
             return Ok(basket ?? new ShoppingCart(username));
         }
 

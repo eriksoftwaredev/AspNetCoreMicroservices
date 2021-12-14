@@ -12,7 +12,7 @@ namespace Basket.API.Entities
 
         public ShoppingCart(string username)
         {
-            username = username;
+            UserName = username;
         }
 
         public ShoppingCart()

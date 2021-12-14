@@ -148,3 +148,17 @@ services:
     ports:
       - "9011:80"
 
+
+  aspnetrunbasics:
+    container_name: aspnetrunbasics
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ApiSettings:GatewayAddress=http://ocelotapigateway"
+    depends_on:
+      - catalog.api
+      - basket.api
+      - discount.api
+      - ordering.api
+      - ocelotapigateway
+    ports:
+      - "9012:80"
